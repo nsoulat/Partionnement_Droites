@@ -99,6 +99,25 @@ Inconvient: on obtient des sous-ensembles avec un nombre d'éléments correponda
 
 _Complexité: comme on obtient pas ce qu'on veut je laisse ce calcul au lecteur_
 
+### Algorithme inclusion
+
+On calcule la première droite `D1` (cas `K = 1`). On dispose de `d1`.
+
+Concrètement, cette droite est la "meilleure" droite: n'importe quelle autre droite augmente la distance au sous-ensemble. Il faut donc conserver cette droite et ajouter des droites pour améliorer le résultat. On suppose donc qu'il y a une inclusion: le sous-ensemble de l'iteration `K` est inclut dans l'itération `K+1`. Dans les faits, il suffit donc de rajouter une droite au sous-ensemble à chaque itération. 
+
+Il faut aussi que les droites du sous-ensemble soit proches l'une de l'autre. On part de l'idée suivante: 
+
+- puisque `D1` est la meilleure droite, on cherche simplement la droite `D2` qui est la plus proche de `D1` (complexité `O(n)`: on balaye la ligne de `D1` et on récupère le min). 
+    - Règle: si `d(D1, D2) > d1`, on élimine la droite candidate et on passe à la deuxième valeur min, jusqu'à trouver la bonne droite `D2`.
+    - On calcule `d2` qui est la distance au sous-ensemble `(D1, D2)`.
+- On cherche la droite `D3` qui est la plus proche de `(D1, D2)` telle que `d(D3, (D1, D2)) < d2`, puisque on calcule la distance au sous-ensemble `(D1, D2, D3)`
+- etc jusqu'à 10
+
+>Problèmes:
+>- est-ce que ça marche vraiment ?
+>- est-ce que c'est la solution optimale ?
+
+
 ### Algorithme principal
 
 > En cours de recherche ...
