@@ -1209,7 +1209,7 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 int main()
 {
 	// durée maximale (secondes) pour les algo de recherches
-	const double t_max = 10.0 * 6; // infini si <= 0
+	const double t_max = 1.0 * 60 * 60; // infini si <= 0
 
 	// nombre maximal de combinaison à tester pour les algo de recherches
 	const unsigned long long iter_max = 0; // infini si 0
