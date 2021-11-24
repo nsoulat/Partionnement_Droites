@@ -4,9 +4,30 @@
 #include <cmath>
 #include <limits>
 #include <algorithm>
+#include <iomanip>
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
+
+void save_result(const std::string name_file, double distance, std::vector<int> droites_id) {
+
+	json j;
+	j["distance"] = distance;
+	j["droites"] = droites_id;
+
+	// write prettified JSON to another file
+	std::ofstream o(name_file);
+	o << std::setw(4) << j << std::endl;
+	std::cout << "résultat sauvegardé dans le fichier " << name_file << std::endl;
+}
+
+void save_result(const std::string name_file, double distance, int* droites_id, int K) {
+	std::vector<int> vect_id;
+	for(int k=0; k<K; k++){
+		vect_id.push_back(droites_id[k]);
+	}
+	save_result(name_file, distance, vect_id);
+}
 
 class Droite {
 private:
@@ -125,6 +146,22 @@ double f(std::vector<Droite>& droites, std::vector<Droite>& subset, double min) 
 		if(dist > max){
 			max = dist;
 			if(max > min){
+				break;
+			}
+		}
+	}
+	return max;
+}
+
+/* fonction à minimiser -> max des distances au sous-ensemble 
+dans le cas où on souhaite trouver que des meilleures (strictes) combinaisons */
+double f_strict(std::vector<Droite>& droites, std::vector<Droite>& subset, double min) {
+	double max = 0;
+	for(Droite droite : droites) {
+		double dist = distance(subset, droite);
+		if(dist > max){
+			max = dist;
+			if(max >= min){
 				break;
 			}
 		}
@@ -1058,8 +1095,128 @@ void tentative_2_iteration_2(json& js) {
 	// }
 }
 
+void full_random(json& js, const double t_max, const unsigned long long iter_max) {
+	
+	std::cout << "\n---*** Full Random ***--" << std::endl;
+	
+	std::cout << "temps max: ";
+	if(t_max <= 0) std::cout << "INFINI";
+	else std::cout << t_max << "s";
+	std::cout << ", iteration max: ";
+	if(iter_max == 0) std::cout << "INFINI";
+	else std::cout << iter_max;
+	std::cout << std::endl;
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	const int N = js["droites"].size();
+	const int K = 10; // 10 droites parmi N
+	const std::string file_resultat = "resultat.json";
+
+	int best_combination[K];
+    int combination[K];
+	std::vector<Droite> droites;
+	std::vector<Droite> subset;
+	int random;
+
+	for(int i=0; i<N; i++) {
+		Droite droite = Droite(
+			js["droites"][i]["point"]["x"].get<double>(),
+			js["droites"][i]["point"]["y"].get<double>(),
+			js["droites"][i]["point"]["z"].get<double>(),
+			js["droites"][i]["vecteur"][0].get<double>(),
+			js["droites"][i]["vecteur"][1].get<double>(),
+			js["droites"][i]["vecteur"][2].get<double>(),
+			i);
+		droites.push_back(droite);
+	}
+
+	try{
+		std::ifstream ifs_resultat(file_resultat);
+		json result = json::parse(ifs_resultat);
+
+		for(int k=0; k<K; k++){
+			int id = result["droites"][k].get<int>();
+			combination[k] = id;
+			subset.push_back(droites[id]);
+		}
+	} catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		for (int i = 0; i < K; i++) {
+			random = rand() % N;
+			combination[i] = random;
+			subset.push_back(droites[random]);
+		}
+	}
+
+	copy(combination, best_combination, K);
+	double min = f(droites, subset, std::numeric_limits<double>::max());
+
+	std::cout << "combinaison de départ: ";
+	for(int i = 0; i < K; i++) {
+		std::cout << combination[i] << " ";
+	}
+	std::cout << ", distance: " << min << std::endl;
+
+	unsigned long long compteur = 1;
+	std::chrono::duration<double> elapsed = std::chrono::high_resolution_clock::now() - start;
+	double time = elapsed.count();
+
+    while ((iter_max == 0 || compteur < iter_max) && (t_max <= 0 || time < t_max)) {
+		subset.clear();
+        
+		for (int i = 0; i < K; i++) {
+			random = rand() % N;
+			combination[i] = random;
+			subset.push_back(droites[random]);
+		}
+
+		double dist = f_strict(droites, subset, min);
+
+		if (dist < min){
+			copy(combination, best_combination, K);
+			min = dist;
+			std::cout << "nouvelle meilleure combinaison: ";
+			for(int i = 0; i < K; i++) {
+				std::cout << combination[i] << " ";
+			}
+			std::cout << ", distance: " << min << std::endl;
+			save_result("resultat.json", min, best_combination, K);
+		}
+
+		compteur++;
+		elapsed = std::chrono::high_resolution_clock::now() - start;
+		time = elapsed.count(); 
+    }
+
+	std::sort(std::begin(best_combination), std::end(best_combination)); // pour un plus bel affichage
+
+	std::cout << "distance: " << min << std::endl;
+	std::cout << "droites:" << std::endl;
+	std::cout << "[";
+	for(int k = 0; k < K-1; k++) {
+		std::cout << best_combination[k] << ", ";
+	}
+	std::cout << best_combination[K-1] << "]" << std::endl;
+	//	{
+    //		"distance": x,
+	//		"droites": [id1, id2, id3, ...]
+    //	}
+	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
+	save_result("resultat.json", min, best_combination, K);
+}
+
 int main()
 {
+	// durée maximale (secondes) pour les algo de recherches
+	const double t_max = 10.0 * 60; // infini si <= 0
+
+	// nombre maximal de combinaison à tester pour les algo de recherches
+	const unsigned long long iter_max = 0; // infini si 0
+
+	/* initialize random seed: */
+	srand(time(NULL));
+
 	std::cout << "\n---*** Lecture fichier JSON ***---" << std::endl;
     auto t_json1 = std::chrono::high_resolution_clock::now();
     std::ifstream ifs("sujet5.instance.json");
@@ -1101,12 +1258,12 @@ int main()
     // std::chrono::duration<double> durationNaif3 = t_naif32 - t_naif31;
    	// std::cout << "algorithme naïf: " << durationNaif3.count() << "s" << std::endl;
 
-	std::cout << "\n---*** Algorithme Naïf Opti ***--" << std::endl;
-	auto t_naif_opti1 = std::chrono::high_resolution_clock::now();
-	naif_opti(js);
-    auto t_naif_opti2 = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> durationNaifOpti = t_naif_opti2 - t_naif_opti1;
-   	std::cout << "algorithme naïf: " << durationNaifOpti.count() << "s" << std::endl;
+	// std::cout << "\n---*** Algorithme Naïf Opti ***--" << std::endl;
+	// auto t_naif_opti1 = std::chrono::high_resolution_clock::now();
+	// naif_opti(js);
+    // auto t_naif_opti2 = std::chrono::high_resolution_clock::now();
+    // std::chrono::duration<double> durationNaifOpti = t_naif_opti2 - t_naif_opti1;
+   	// std::cout << "algorithme naïf: " << durationNaifOpti.count() << "s" << std::endl;
 
 	// std::cout << "\n---*** Algorithme non fonctionnel Pas Naïf ***--" << std::endl;
 	// auto t_pas_naif1 = std::chrono::high_resolution_clock::now();
@@ -1135,6 +1292,12 @@ int main()
     // auto t_iteration22 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationIteration2 = t_iteration22 - t_iteration21;
    	// std::cout << "algorithme itératif sans égalité: " << durationIteration2.count() << "s" << std::endl;
+
+	auto t_random1 = std::chrono::high_resolution_clock::now();
+	full_random(js, t_max, iter_max);
+    auto t_random2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> durationRandom = t_random2 - t_random1;
+   	std::cout << "algorithme random: " << durationRandom.count() << "s" << std::endl;
 
     //std::cout << "---*** Résultats ***---" << std::endl;
     return 0;
