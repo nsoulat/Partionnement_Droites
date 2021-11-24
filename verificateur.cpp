@@ -43,8 +43,8 @@ double distance(double px, double py, double pz, double ux, double uy, double uz
 	pvectoriel(w, ux, uy, uz, vx, vy, vz);
 	double w_norme = norme(w[0], w[1], w[2]);
 	double eps = 0.000000000001;
-	if(w_norme < eps && w_norme > -eps)	return 0;
-	else return abs(pscalaire(qx-px, qy-py, qz-pz, w[0], w[1], w[2]) / w_norme);
+	if(w_norme < eps && w_norme > -eps) return 0;
+    else return std::abs(pscalaire(qx-px, qy-py, qz-pz, w[0], w[1], w[2]) / w_norme);
 }
 
 
@@ -56,7 +56,7 @@ double distance(std::vector<Droite>& droites, double px, double py, double pz, d
 			double* p = droite.getPoint();
 			double* v = droite.getVect();
 			double dist = distance(p[0], p[1], p[2], v[0], v[1], v[2], px, py, pz, ux, uy, uz);
-			if(dist < min) {
+            if(dist < min) {
 				min = dist;
                 if(dist < max){
                     break;
@@ -64,7 +64,7 @@ double distance(std::vector<Droite>& droites, double px, double py, double pz, d
 			}
 		}
 	}
-	return min;
+    return min;
 }
 
 double f(json& js, int N, std::vector<Droite>& droites) {

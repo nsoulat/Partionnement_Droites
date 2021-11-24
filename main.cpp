@@ -67,7 +67,7 @@ double distance(double px, double py, double pz, double ux, double uy, double uz
 	double w_norme = norme(w[0], w[1], w[2]);
 	double eps = 0.000000000001;
 	if(w_norme < eps && w_norme > -eps)	return 0;
-	else return abs(pscalaire(qx-px, qy-py, qz-pz, w[0], w[1], w[2]) / w_norme);
+	else return std::abs(pscalaire(qx-px, qy-py, qz-pz, w[0], w[1], w[2]) / w_norme);
 }
 
 /* distance entre deux droites */
@@ -81,7 +81,7 @@ double distance(Droite& d1, Droite& d2) {
 	double w_norme = norme(w[0], w[1], w[2]);
 	double eps = 0.000000000001;
 	if(w_norme < eps && w_norme > -eps) return 0;
-	else return abs(pscalaire(q[0]-p[0], q[1]-p[1], q[2]-p[2], w[0], w[1], w[2]) / w_norme);
+	else return std::abs(pscalaire(q[0]-p[0], q[1]-p[1], q[2]-p[2], w[0], w[1], w[2]) / w_norme);
 }
 
 /* distance d'une droite à un ensemble de droites */
@@ -1209,7 +1209,7 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 int main()
 {
 	// durée maximale (secondes) pour les algo de recherches
-	const double t_max = 10.0 * 60; // infini si <= 0
+	const double t_max = 10.0 * 6; // infini si <= 0
 
 	// nombre maximal de combinaison à tester pour les algo de recherches
 	const unsigned long long iter_max = 0; // infini si 0
