@@ -5,6 +5,7 @@
 #include <limits>
 #include <algorithm>
 #include <iomanip>
+#include <sstream>
 #include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
@@ -19,6 +20,17 @@ void save_result(const std::string name_file, double distance, std::vector<int> 
 	std::ofstream o(name_file);
 	o << std::setw(4) << j << std::endl;
 	std::cout << "résultat sauvegardé dans le fichier " << name_file << std::endl;
+}
+
+std::string getCTimeNow()
+{
+	const std::string format =  "%Y-%m-%d %H:%M:%S";
+	auto now = std::chrono::high_resolution_clock::now();
+	std::time_t tt = std::chrono::system_clock::to_time_t(now);
+    std::tm tm = *std::gmtime(&tt); //GMT (UTC)
+    std::stringstream ss;
+    ss << std::put_time(&tm, format.c_str() );
+    return ss.str();
 }
 
 void save_result(const std::string name_file, double distance, int* droites_id, int K) {
@@ -1099,6 +1111,10 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 	
 	std::cout << "\n---*** Full Random ***--" << std::endl;
 	
+	auto start = std::chrono::high_resolution_clock::now();
+
+	std::cout << "début à " << getCTimeNow() << std::endl;
+
 	std::cout << "temps max: ";
 	if(t_max <= 0) std::cout << "INFINI";
 	else std::cout << t_max << "s";
@@ -1106,8 +1122,6 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 	if(iter_max == 0) std::cout << "INFINI";
 	else std::cout << iter_max;
 	std::cout << std::endl;
-
-	auto start = std::chrono::high_resolution_clock::now();
 
 	const int N = js["droites"].size();
 	const int K = 10; // 10 droites parmi N
@@ -1176,6 +1190,7 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 		if (dist < min){
 			copy(combination, best_combination, K);
 			min = dist;
+			std::cout << "(" << getCTimeNow() << ") ";
 			std::cout << "nouvelle meilleure combinaison: ";
 			for(int i = 0; i < K; i++) {
 				std::cout << combination[i] << " ";
@@ -1204,12 +1219,14 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
     //	}
 	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
 	save_result("resultat.json", min, best_combination, K);
+
+	std::cout << "FIN : " << getCTimeNow() << std::endl;
 }
 
 int main()
 {
 	// durée maximale (secondes) pour les algo de recherches
-	const double t_max = 1.0 * 60 * 60; // infini si <= 0
+	const double t_max = 0.1 * 60; // infini si <= 0
 
 	// nombre maximal de combinaison à tester pour les algo de recherches
 	const unsigned long long iter_max = 0; // infini si 0
