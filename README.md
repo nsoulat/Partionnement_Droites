@@ -8,9 +8,19 @@ authors:
 
 # Projet FIG : Partitionnement de droites
 
+- [Enoncé](#Enonce)
+- [Résolutions](#Resolutions)
+    - [Algorithmes Naïfs](#Algorithme-naifs)
+    - [Tentatives non naïves](#Tentatives-non-naives)
+    - [Algorithme aléatoire](#Algorithme-aleatoire)
+- [Conclusion](#Conclusion)
+- [Installer et lancer le projet](#Installer-et-lancer-le-projet)
+
+## Enoncé
+
 ![image](https://user-images.githubusercontent.com/75546258/141136749-815f4440-a7a6-46ea-abd9-3dc462c15c71.png)
 
-## Résolution
+## Résolutions
 
 Toutes les solutions proposées sont gérénalisables pour prendre un sous-ensemble de `K` droites de l'ensemble de `N`.
 On aura par défault `K = 10` et `N = 100000` (d'après la taille du fichier json).
@@ -35,7 +45,7 @@ Si on reprend le premier algorithme naïf, on peut constater que calculer le max
 
 **Résultats:** Bien qu'optimisé, il faudrait facilement plusieurs trillions d'années pour parcourir toutes les combinaisons (*ie* `(10 parmi 100000) = 2x10^43` combinaisons).
 
-### Première tentative non naïve
+### Tentatives non naïves
 
 Nous avons donc réfléchi à des méthodes mathématiques de résolution... afin de ne pas à avoir à parcourir toutes les combinaisons pour avoir la solution optimale.
 
