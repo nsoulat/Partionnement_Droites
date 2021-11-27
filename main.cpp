@@ -10,6 +10,12 @@
 
 using json = nlohmann::json;
 
+/* =====================
+
+### Fonctions utiles ### 
+
+====================== */
+
 void save_result(const std::string name_file, double distance, std::vector<int> droites_id) {
 
 	json j;
@@ -20,6 +26,14 @@ void save_result(const std::string name_file, double distance, std::vector<int> 
 	std::ofstream o(name_file);
 	o << std::setw(4) << j << std::endl;
 	std::cout << "résultat sauvegardé dans le fichier " << name_file << std::endl;
+}
+
+void save_result(const std::string name_file, double distance, int* droites_id, int K) {
+	std::vector<int> vect_id;
+	for(int k=0; k<K; k++){
+		vect_id.push_back(droites_id[k]);
+	}
+	save_result(name_file, distance, vect_id);
 }
 
 std::string getCTimeNow()
@@ -33,13 +47,54 @@ std::string getCTimeNow()
     return ss.str();
 }
 
-void save_result(const std::string name_file, double distance, int* droites_id, int K) {
-	std::vector<int> vect_id;
-	for(int k=0; k<K; k++){
-		vect_id.push_back(droites_id[k]);
+void copy(int* src, int* dest, int length) {
+	for(int i = 0; i < length; i++) {
+		dest[i] = src[i];
 	}
-	save_result(name_file, distance, vect_id);
 }
+
+void add_combination(std::vector<std::vector<int>>& best_combinations, int* combination, int K) {
+	std::vector<int> new_combination;
+	for (int k=0; k<K; k++) {
+		new_combination.push_back(combination[k]);
+	}
+	best_combinations.push_back(new_combination);
+}
+
+bool is_in_combination(int id, std::vector<int>& combination) {
+	for(int i: combination){
+		if(id == i){
+			return true;
+		}
+	}
+	return false;
+}
+
+void copy(std::vector<std::vector<int>>& src, std::vector<std::vector<int>>& dest) {
+	dest.clear();
+	for(int i=0; i<src.size(); i++){
+		std::vector<int> new_vect;
+		for(int el: src[i]){
+			new_vect.push_back(el);
+		}
+		dest.push_back(new_vect);
+	}
+}
+
+/* /!\ les vecteurs de src doivent être triés */
+bool is_new_combination(std::vector<std::vector<int>>& src, std::vector<int> new_comb) {
+	std::sort(new_comb.begin(), new_comb.end());
+	for (std::vector<int> comb : src) {
+		if(comb == new_comb) return false;
+	}
+	return true;
+}
+
+/* =====================================================
+
+### Fonctions principales pour les droites et points ### 
+
+====================================================== */
 
 class Droite {
 private:
@@ -70,6 +125,12 @@ void pvectoriel(double* w, double ux, double uy, double uz, double vx, double vy
 double norme(double ux, double uy, double uz) {
 	return sqrt(ux*ux + uy*uy + uz*uz);
 }
+
+/* ==============
+
+### Distances ### 
+
+=============== */
 
 /* distance entre deux droites */
 double distance(double px, double py, double pz, double ux, double uy, double uz,
@@ -181,29 +242,17 @@ double f_strict(std::vector<Droite>& droites, std::vector<Droite>& subset, doubl
 	return max;
 }
 
-void copy(int* src, int* dest, int length) {
-	for(int i = 0; i < length; i++) {
-		dest[i] = src[i];
-	}
-}
+/* ======================
 
-void add_combination(std::vector<std::vector<int>>& best_combinations, int* combination, int K) {
-	std::vector<int> new_combination;
-	for (int k=0; k<K; k++) {
-		new_combination.push_back(combination[k]);
-	}
-	best_combinations.push_back(new_combination);
-}
+### Algorithmes Naïfs ### 
+
+======================= */
 
 /* algo naïf -> on teste tous les sous-ensembles
  - on recalcule les distances à la volée - */
 void naif(json& js) {
-
-	// unsigned long long compteur_quadrillion = 0;
-	// unsigned long long compteur = 0;
-
-	// unsigned long long max_compteur_quadrillon = 263409;
-	// unsigned long long max_compteur = 560461970212832400;
+	
+	std::cout << "\n---*** Algorithme Naïf ***--" << std::endl;
 
 	const int N = js["droites"].size();
 	const int K = 3; // 10 droites parmi N
@@ -295,10 +344,6 @@ void naif(json& js) {
 		}
 		std::cout << best_combination[K-1] << "]" << std::endl;
 	}
-	//	{
-    //		"distance": x,
-	//		"droites": [id1, id2, id3, ...]
-    //	}
 	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
 }
 
@@ -307,11 +352,7 @@ void naif(json& js) {
  - petite amélioration : on stocke les droites au lieu de les re-récupérer dans le json à chaque fois */
 void naif2(json& js) {
 
-	// unsigned long long compteur_quadrillion = 0;
-	// unsigned long long compteur = 0;
-
-	// unsigned long long max_compteur_quadrillon = 263409;
-	// unsigned long long max_compteur = 560461970212832400;
+	std::cout << "\n---*** Algorithme Naïf 2 ***--" << std::endl;
 
 	const int N = js["droites"].size();
 	const int K = 3; // 10 droites parmi N
@@ -397,10 +438,6 @@ void naif2(json& js) {
 		}
 		std::cout << best_combination[K-1] << "]" << std::endl;
 	}
-	//	{
-    //		"distance": x,
-	//		"droites": [id1, id2, id3, ...]
-    //	}
 	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
 }
 
@@ -410,15 +447,10 @@ void naif2(json& js) {
  - on passe à la combinaison suivante dès que c'est sûr que c'est perdu */
 void naif3(json& js) {
 
-	// unsigned long long compteur_quadrillion = 0;
-	// unsigned long long compteur = 0;
+	std::cout << "\n---*** Algorithme Naïf 3 ***--" << std::endl;
 
-	// unsigned long long max_compteur_quadrillon = 263409;
-	// unsigned long long max_compteur = 560461970212832400;
-
-	// const int N = js["droites"].size();
-	const int N = 50;
-	const int K = 5; // 10 droites parmi N
+	const int N = js["droites"].size();
+	const int K = 10; // 10 droites parmi N
 
 	std::vector<std::vector<int>> best_combinations;
     int combination[K];
@@ -499,10 +531,6 @@ void naif3(json& js) {
 		}
 		std::cout << best_combination[K-1] << "]" << std::endl;
 	}
-	//	{
-    //		"distance": x,
-	//		"droites": [id1, id2, id3, ...]
-    //	}
 	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
 }
 
@@ -512,8 +540,9 @@ void naif3(json& js) {
  - mais cette technique est plus optimisée pour des N plus petits */
 void naif_opti(json& js) {
 
-	// const int N = js["droites"].size();
-	const int N = 50;
+	std::cout << "\n---*** Algorithme Naïf Opti ***--" << std::endl;
+
+	const int N = js["droites"].size();
 	const int K = 10; // 10 droites parmi N
 
 	std::vector<Droite> droites;
@@ -529,19 +558,14 @@ void naif_opti(json& js) {
 		droites.push_back(droite);
     }
 
-	//std::cout << "vecteur de " << N << " droites créé" << std::endl;
-
 	std::vector<std::vector<double>> distances;
 	distances.resize(N, std::vector<double>(N, 0));
-	//std::cout << "matrice " << N << "x" << N << " de distance créée avec max size: " << distances.max_size() << std::endl;
 	
 	for (Droite droite1 : droites) {
 		for (Droite droite2 : droites) {
 			distances[droite1.id][droite2.id] = distance(droite1, droite2);
 		}
 	}
-
-	// std::cout << "matrice " << N << "x" << N << " de distance remplie" << std::endl;
 
 	std::vector<std::vector<int>> best_combinations;
     int combination[K];
@@ -652,8 +676,18 @@ void naif_opti(json& js) {
 	// }
 }
 
-/* Un algorithme pas naïf en O(n²) */
+/* ==========================
+
+### Tentatives non naïves ### 
+
+=========================== */
+
+/* Un algorithme pas naïf en O(n²)
+cf "Un énoncé proche" du README.md
+ */
 void tentative_1_pas_naif(json& js) {
+
+	std::cout << "\n---*** Algorithme non fonctionnel Pas Naïf ***--" << std::endl;
 
 	const int N = js["droites"].size();
 	const int K = 10; // 10 droites parmi N
@@ -731,14 +765,13 @@ void tentative_1_pas_naif(json& js) {
 		std::cout << best_combination[i] << ", ";
 	}
 	std::cout << best_combination[K-1] << "]" << std::endl;
-	//	{
-    //		"distance": x,
-	//		"droites": [id1, id2, id3, ...]
-    //	}
 }
 
-/* Un algorithme pas naïf en O(n²) - on stocke les droites dans un vecteur */
+/* Un algorithme pas naïf en O(n²)
+version précédente optimisé - on stocke les droites dans un vecteur */
 void tentative_1_pas_naif2(json& js) {
+
+	std::cout << "\n---*** Algorithme non fonctionnel Pas Naïf amélioré ***--" << std::endl;
 
 	const int N = js["droites"].size();
 	const int K = 10; // 10 droites parmi N
@@ -819,38 +852,11 @@ void tentative_1_pas_naif2(json& js) {
 	std::cout << best_combination[K-1] << "]" << std::endl;
 }
 
-bool is_in_combination(int id, std::vector<int>& combination) {
-	for(int i: combination){
-		if(id == i){
-			return true;
-		}
-	}
-	return false;
-}
-
-void copy(std::vector<std::vector<int>>& src, std::vector<std::vector<int>>& dest) {
-	dest.clear();
-	for(int i=0; i<src.size(); i++){
-		std::vector<int> new_vect;
-		for(int el: src[i]){
-			new_vect.push_back(el);
-		}
-		dest.push_back(new_vect);
-	}
-}
-
-/* /!\ les vecteurs de src doivent être triés */
-bool is_new_combination(std::vector<std::vector<int>>& src, std::vector<int> new_comb) {
-	std::sort(new_comb.begin(), new_comb.end());
-	for (std::vector<int> comb : src) {
-		if(comb == new_comb) return false;
-	}
-	return true;
-}
-
-
-/* Un algorithme avec itération en O(n^3) */
+/* Un algorithme avec itération en O(n^3) 
+cf "Inclusion des solutions" du README.md */
 void tentative_2_iteration(json& js) {
+
+	std::cout << "\n---*** Algorithme Itératif ***--" << std::endl;
 
 	const int N = js["droites"].size();
 	const int K = 5; // 10 droites parmi N
@@ -990,6 +996,8 @@ void tentative_2_iteration(json& js) {
 /* Un algorithme avec itération en O(n^3) - sans les égalités, on prend le premier meilleur venu */
 void tentative_2_iteration_2(json& js) {
 
+	std::cout << "\n---*** Algorithme Itératif sans égalité ***--" << std::endl;
+
 	const int N = js["droites"].size();
 	const int K = 3; // 10 droites parmi N
 
@@ -1107,6 +1115,12 @@ void tentative_2_iteration_2(json& js) {
 	// }
 }
 
+/* ==================
+
+Algorithme Aléatoire
+
+=================== */
+
 void full_random(json& js, const double t_max, const unsigned long long iter_max) {
 	
 	std::cout << "\n---*** Full Random ***--" << std::endl;
@@ -1213,15 +1227,17 @@ void full_random(json& js, const double t_max, const unsigned long long iter_max
 		std::cout << best_combination[k] << ", ";
 	}
 	std::cout << best_combination[K-1] << "]" << std::endl;
-	//	{
-    //		"distance": x,
-	//		"droites": [id1, id2, id3, ...]
-    //	}
 	std::cout << "nombre de combinaisons: " << compteur << " (N=" << N << ", K=" << K << ")" << std::endl;
 	save_result("resultat.json", min, best_combination, K);
 
 	std::cout << "FIN : " << getCTimeNow() << std::endl;
 }
+
+/* =========
+
+     MAIN
+
+========== */
 
 int main()
 {
@@ -1237,73 +1253,55 @@ int main()
 	std::cout << "\n---*** Lecture fichier JSON ***---" << std::endl;
     auto t_json1 = std::chrono::high_resolution_clock::now();
     std::ifstream ifs("sujet5.instance.json");
-	// std::ifstream ifs("test.json");
     json js = json::parse(ifs);
-
-    // js = {
-    // 		"droites": [
-	// 			{
-	// 				"point": {x, y, z},
-	// 				"vecteur": [v_x, v_y, v_z]
-	// 			}, ...
-	// 		]
-    // }
 
     auto t_json2 = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> durationJson = t_json2 - t_json1;
 	std::cout << "lecture du fichier JSON: " << durationJson.count() << "s" << std::endl;
 	std::cout << "nombre de droites: " << js["droites"].size() << std::endl;
 
-	// std::cout << "\n---*** Algorithme Naïf ***--" << std::endl;
 	// auto t_naif1 = std::chrono::high_resolution_clock::now();
 	// naif(js);
     // auto t_naif2 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationNaif = t_naif2 - t_naif1;
    	// std::cout << "algorithme naïf: " << durationNaif.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme Naïf 2 ***--" << std::endl;
 	// auto t_naif21 = std::chrono::high_resolution_clock::now();
 	// naif2(js);
     // auto t_naif22 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationNaif2 = t_naif22 - t_naif21;
    	// std::cout << "algorithme naïf: " << durationNaif2.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme Naïf 3 ***--" << std::endl;
 	// auto t_naif31 = std::chrono::high_resolution_clock::now();
 	// naif3(js);
     // auto t_naif32 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationNaif3 = t_naif32 - t_naif31;
    	// std::cout << "algorithme naïf: " << durationNaif3.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme Naïf Opti ***--" << std::endl;
 	// auto t_naif_opti1 = std::chrono::high_resolution_clock::now();
 	// naif_opti(js);
     // auto t_naif_opti2 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationNaifOpti = t_naif_opti2 - t_naif_opti1;
    	// std::cout << "algorithme naïf: " << durationNaifOpti.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme non fonctionnel Pas Naïf ***--" << std::endl;
 	// auto t_pas_naif1 = std::chrono::high_resolution_clock::now();
 	// tentative_1_pas_naif(js);
     // auto t_pas_naif2 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationPasNaif = t_pas_naif2 - t_pas_naif1;
    	// std::cout << "algorithme pas naïf: " << durationPasNaif.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme non fonctionnel Pas Naïf 2 ***--" << std::endl;
 	// auto t_pas_naif21 = std::chrono::high_resolution_clock::now();
 	// tentative_1_pas_naif2(js);
     // auto t_pas_naif22 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationPasNaif2 = t_pas_naif22 - t_pas_naif21;
    	// std::cout << "algorithme pas naïf: " << durationPasNaif2.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme Itératif ***--" << std::endl;
 	// auto t_iteration1 = std::chrono::high_resolution_clock::now();
 	// tentative_2_iteration(js);
     // auto t_iteration2 = std::chrono::high_resolution_clock::now();
     // std::chrono::duration<double> durationIteration = t_iteration2 - t_iteration1;
    	// std::cout << "algorithme itératif: " << durationIteration.count() << "s" << std::endl;
 
-	// std::cout << "\n---*** Algorithme Itératif sans égalité ***--" << std::endl;
 	// auto t_iteration21 = std::chrono::high_resolution_clock::now();
 	// tentative_2_iteration_2(js);
     // auto t_iteration22 = std::chrono::high_resolution_clock::now();
@@ -1316,6 +1314,5 @@ int main()
     std::chrono::duration<double> durationRandom = t_random2 - t_random1;
    	std::cout << "algorithme random: " << durationRandom.count() << "s" << std::endl;
 
-    //std::cout << "---*** Résultats ***---" << std::endl;
     return 0;
 }
