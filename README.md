@@ -10,7 +10,7 @@ authors:
 
 - [Enoncé](#enoncé)
 - [Résolutions](#résolutions)
-    - [Algorithmes Naïfs](#algorithme-naïfs)
+    - [Algorithmes Naïfs](#algorithmes-naïfs)
     - [Tentatives non naïves](#tentatives-non-naïves)
     - [Algorithme aléatoire](#algorithme-aléatoire)
 - [Conclusion](#conclusion)
