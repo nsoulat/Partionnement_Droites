@@ -8,13 +8,13 @@ authors:
 
 # Projet FIG : Partitionnement de droites
 
-- [Enoncé](#Enonce)
-- [Résolutions](#Resolutions)
-    - [Algorithmes Naïfs](#Algorithme-naifs)
-    - [Tentatives non naïves](#Tentatives-non-naives)
-    - [Algorithme aléatoire](#Algorithme-aleatoire)
-- [Conclusion](#Conclusion)
-- [Installer et lancer le projet](#Installer-et-lancer-le-projet)
+- [Enoncé](#enoncé)
+- [Résolutions](#résolutions)
+    - [Algorithmes Naïfs](#algorithme-naïfs)
+    - [Tentatives non naïves](#tentatives-non-naïves)
+    - [Algorithme aléatoire](#algorithme-aléatoire)
+- [Conclusion](#conclusion)
+- [Installer et lancer le projet](#installer-et-lancer-le-projet)
 
 ## Enoncé
 
