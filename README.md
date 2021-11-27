@@ -94,7 +94,7 @@ On discerne déjà l'algorithme itératif utilisée:
 
 ##### Complexité
 
-À chaque itération, on teste tous les 
+À chaque itération, on teste tous les distances une fois, pour trouver le centre dans chaque partition, donc complexité en `O(Kn²)`.
 
 ##### Algorithme récursif
 
@@ -158,8 +158,8 @@ L'algorithme commence avec la combinaison trouvé dans ``résultat.json` (la mei
 > Résultat final:
 >
 > ```JSON
-> distance: 1,
-> droites: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+> "distance": 1,
+> "droites": [1, 2, 3, 4, 5, 6, 7, 8, 9]
 > ```
 
 ## Installer et lancer le projet
