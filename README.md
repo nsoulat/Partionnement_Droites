@@ -2,8 +2,8 @@
 title:  "Partitionnement de droites"
 category: projet GIG
 authors:
-- [William Templeton](https://github.com/WTempleton)
-- [Nathanaël Soulat](https://github.com/nsoulat)
+- William Templeton
+- Nathanaël Soulat
 ---
 
 # Projet FIG : Partitionnement de droites
