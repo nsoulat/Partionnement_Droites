@@ -21,7 +21,7 @@ On aura par défault `K = 10` et `N = 100000` (d'après la taille du fichier jso
 
 L'algorithme va tester toutes les combinaisons possibles de `K` droites parmi `N` droites et calculer à la volée toutes les distances des droites à ce sous-ensemble, pour au final afficher quelle combinaison a eu le meilleur score (*ie* la distance la plus faible aux restes des droites).
 
-**Résultats:** Cette méthode est impraticable pour le sujet initial. La complexité est en *O(n x (k parmi n))* et il faudrait des années pour savoir quel est le meilleur ensemble. Juste pour K=10 et N=23, il lui faut environ 30s. Eviter donc d'attendre la fin de l'algorithme s'il existe trop de combinaisons.
+**Résultats:** Cette méthode est impraticable pour le sujet initial. La complexité est en *O(n x (k parmi n))* et il faudrait des années pour savoir quel est le meilleur ensemble. Juste pour K=10 et N=23, il lui faut environ 30s. Conseil: éviter d'attendre la fin de l'algorithme s'il existe trop de combinaisons.
 
 #### Algorithme naïf - Amélioré (tableau des distances)
 
@@ -135,7 +135,7 @@ Trouver la meilleure droite à ajouter se fait au pire en `O(n^3)` si on teste t
 
 **Résultats:** Encore malheureusement, il n'y a pas inclusion entre les espaces de solution, ce qui rends faux la construction de cette "solution optimale".
 
-> Par ailleurs, l'algorithme peut vite gagner en complexité car en réalité, il peut y avoir plusieurs solutions optimales à chaque K, il faut donc toutes les garder en mémoire pour tester toutes les combinaisons, et donc la complexité peut exploser en 2^K)
+> Par ailleurs, l'algorithme peut vite gagner en complexité car en réalité, il peut y avoir plusieurs solutions optimales à chaque K, il faut donc toutes les garder en mémoire pour tester toutes les combinaisons, et donc la complexité peut exploser en 2^K.
 
 ### Algorithme aléatoire
 
