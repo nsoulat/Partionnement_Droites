@@ -5,7 +5,13 @@ authors:
 - William Templeton
 - Nathanaël Soulat
 ---
-
+<style>
+    @media (prefers-color-scheme: dark) {
+        img[src ^= "svgs/"] {
+            filter: invert(1);
+        }
+    }
+</style>
 # Projet FIG : Partitionnement de droites
 
 - [Enoncé](#enoncé)
@@ -15,7 +21,6 @@ authors:
     - [Algorithme aléatoire](#algorithme-aléatoire)
 - [Conclusion](#conclusion)
 - [Installer et lancer le projet](#installer-et-lancer-le-projet)
-
 ## Enoncé
 
 ![image](https://user-images.githubusercontent.com/75546258/141136749-815f4440-a7a6-46ea-abd9-3dc462c15c71.png)
@@ -37,7 +42,7 @@ L'algorithme va tester toutes les combinaisons possibles de <img src="svgs/d6328
 
 #### Algorithme naïf - Amélioré (tableau des distances)
 
-L'algorithme va tester toutes les combinaisons possibles de <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/> droites parmi `N` droites mais au lieu de re-calculer à chaque fois les distances à la volée, va remplir un tableau <img src="svgs/a964749a6b635295960fe89162eda4de.svg?invert_in_darkmode" align=middle width=50.091150449999994pt height=22.465723500000017pt/> contenant les distances d'une droite à l'autre.  
+L'algorithme va tester toutes les combinaisons possibles de <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/> droites parmi <img src="svgs/f9c4988898e7f532b9f826a75014ed3c.svg?invert_in_darkmode" align=middle width=14.99998994999999pt height=22.465723500000017pt/> droites mais au lieu de re-calculer à chaque fois les distances à la volée, va remplir un tableau <img src="svgs/a964749a6b635295960fe89162eda4de.svg?invert_in_darkmode" align=middle width=50.091150449999994pt height=22.465723500000017pt/> contenant les distances d'une droite à l'autre.  
 
 **Résultats:** Cette méthode est bien plus rapide que la précédente mais reste impraticable pour le sujet initial car stocker un tel tableau de `double` demanderait de bien trop grandes ressources. Cet algorithme est donc préférable au précédent pour des <img src="svgs/f9c4988898e7f532b9f826a75014ed3c.svg?invert_in_darkmode" align=middle width=14.99998994999999pt height=22.465723500000017pt/> raisonnables.
 
@@ -49,17 +54,17 @@ Si on reprend le premier algorithme naïf, on peut constater que calculer le max
 
 ### Tentatives non naïves
 
-Nous avons donc réfléchi à des méthodes mathématiques de résolution... afin de ne pas à avoir à parcourir toutes les combinaisons pour avoir la solution optimale.
+Nous avons donc réfléchi à des méthodes mathématiques de résolution afin de ne pas à avoir à parcourir toutes les combinaisons pour avoir la solution optimale.
 
 #### Un énoncé proche
 
 Voici l'idée derrière l'algorithme:
-Imaginons qu'on ait un tableau des distances (+ simple pour la visualisation), on parcourt chaque colonne (ie chaque droite) et on récupère les <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/> plus grandes distances. On compare ensuite la <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/>-ème plus grande valeur de chaque colonne et on prend la colonne ayant celle la plus faible. La droite associée à cette colonne est la première dans la combinaison et les <img src="svgs/877f17da0d7c756840fdc976d3c9e264.svg?invert_in_darkmode" align=middle width=43.44740069999999pt height=22.465723500000017pt/> autres sont les droites les plus loins de cette droite (*ie* les <img src="svgs/877f17da0d7c756840fdc976d3c9e264.svg?invert_in_darkmode" align=middle width=43.44740069999999pt height=22.465723500000017pt/> plus grandes valeurs de sa colonne).
+Imaginons qu'on ait un tableau des distances (plus simple pour la visualisation). On parcourt chaque colonne (*ie* chaque droite) et on récupère les <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/> plus grandes distances. On compare ensuite la <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/>-ème plus grande valeur de chaque colonne et on prend la colonne ayant la valeur la plus faible. La droite associée à cette colonne est la première dans la combinaison et les <img src="svgs/877f17da0d7c756840fdc976d3c9e264.svg?invert_in_darkmode" align=middle width=43.44740069999999pt height=22.465723500000017pt/> autres sont les droites les plus loins de cette droite (*ie* les <img src="svgs/877f17da0d7c756840fdc976d3c9e264.svg?invert_in_darkmode" align=middle width=43.44740069999999pt height=22.465723500000017pt/> plus grandes valeurs de sa colonne).
 L'algorithme est en <img src="svgs/039750d598df867f46247ef0c8b2e03b.svg?invert_in_darkmode" align=middle width=35.64773519999999pt height=24.65753399999998pt/> car il suffit de parcourir le pseudo tableau des distances une seule fois pour avoir les droites qui composent le meilleur sous-ensemble.
 
-**Résultats:** L'algorithme donne une réponse très rapidement (moins d'une minute, voire en quelques secondes avec optimisation). Cependant cet algorithme ne donne pas tout à fait le résultat attendu. En effet, les droites dans le sous-ensemble ne sont pas forcément proches, ainsi, cet algorithme répond seulement à l'énoncé où on minimise <img src="svgs/f2c20a5dce73fe62a09c51ca070636e6.svg?invert_in_darkmode" align=middle width=260.96494215pt height=24.7161288pt/>.
+**Résultats:** L'algorithme donne une réponse très rapidement (moins d'une minute, voire en quelques secondes avec optimisation). Cependant, cet algorithme ne donne pas tout à fait le résultat attendu. En effet, les droites dans le sous-ensemble ne sont pas forcément proches, ainsi, cet algorithme répond seulement à l'énoncé où on minimise <img src="svgs/c1a41965a5739876f2fcaaa47085d3e8.svg?invert_in_darkmode" align=middle width=264.6179283pt height=24.7161288pt/>.
 
-Une preuve par l'absurde peut se faire pour démontrer que cette combinaison est la meilleure (laissée au lecteur). Et la distance donnée par cet algorithme est loin d'être la meilleure (environ 6)... (en parcourant au hasard quelques combinaisons on trouve très facilement mieux).
+Une preuve par l'absurde peut se faire pour démontrer que cette combinaison est la meilleure (laissée au lecteur). Et la distance donnée par cet algorithme est loin d'être la meilleure (environ 6)... En parcourant au hasard quelques combinaisons on trouve très facilement mieux.
 
 #### Division de l'espace
 
@@ -73,9 +78,7 @@ Pour chaque droite (donc chaque ligne du tableau), on ne garde que la valeur max
 
 Nommons cette valeur <img src="svgs/90085a0c43d72e4deebf6ed4a8d9e014.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/>. Intuitivement, on voit ici que le sous-ensemble (composée d'une seule droite) est le "centre" de toutes les autres droites: il ne peut pas s'agir d'une droite plus excentrée, sinon sa distance max serait plus grande.
 
-*note: ça a été plus facile de visualiser ça soit avec un nuage de points, soit des images d'électromagnétique avec des centres chargées et des lignes de niveau; mais l'idée s'applique ici aussi, on ne parle que de distances.*
-
-> Conjecture: <img src="svgs/8d006484ae0dea7b93dba73d05172781.svg?invert_in_darkmode" align=middle width=94.16078099999999pt height=22.831056599999986pt/> ...
+> On conjecture que <img src="svgs/8d006484ae0dea7b93dba73d05172781.svg?invert_in_darkmode" align=middle width=94.16078099999999pt height=22.831056599999986pt/> ...
 
 ##### Cas <img src="svgs/9ef148a4e8883871a96554228e19ff08.svg?invert_in_darkmode" align=middle width=45.273840149999984pt height=22.465723500000017pt/>
 
@@ -91,7 +94,7 @@ Le sous-ensemble final correspond donc à la réunion des deux droites trouvées
 
 On suit la même méthode: on se place sur la droite la plus éloignée d'un des deux centres. La première partition correpond aux droites de distances inférieures à <img src="svgs/25eda7b7741f869a00061a631b356db9.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/>. On fait de même pour l'autre centre: on obtient la deuxième partition. Les autres droites qui ne sont pas dans une des deux partitions constituent la troisième partition.
 
-*note: il faudrait démontrer qu'utiliser <img src="svgs/90085a0c43d72e4deebf6ed4a8d9e014.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/> fournit deux partition, utiliser <img src="svgs/25eda7b7741f869a00061a631b356db9.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/> fournit trois partitions, etc.*
+>*Il faudrait démontrer qu'utiliser <img src="svgs/90085a0c43d72e4deebf6ed4a8d9e014.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/> fournit deux partition, utiliser <img src="svgs/25eda7b7741f869a00061a631b356db9.svg?invert_in_darkmode" align=middle width=15.10851044999999pt height=22.831056599999986pt/> fournit trois partitions, etc.*
 
 Pour chaque partition, on se ramène au cas <img src="svgs/6548debba4b05edacf375ef470d3292a.svg?invert_in_darkmode" align=middle width=45.273840149999984pt height=22.465723500000017pt/>.
 
@@ -111,7 +114,7 @@ On discerne déjà l'algorithme itératif utilisée:
 
 ##### Algorithme récursif
 
-On pourrait améliorer la rapidité de l'algorithme récursivement: au lieu d'incrémenter, on diviser toujours la partition en deux:
+On pourrait améliorer la rapidité de l'algorithme récursivement: au lieu d'incrémenter, en divisant toujours la partition en deux:
 
 - Cas <img src="svgs/6548debba4b05edacf375ef470d3292a.svg?invert_in_darkmode" align=middle width=45.273840149999984pt height=22.465723500000017pt/>: on se retrouve avec deux partitions
 - Cas <img src="svgs/9ef148a4e8883871a96554228e19ff08.svg?invert_in_darkmode" align=middle width=45.273840149999984pt height=22.465723500000017pt/>: on trouve le "centre" de chaque partition et on l'utilise pour diviser chaque partition en deux
@@ -146,7 +149,7 @@ Concrètement, cette droite est la "meilleure" droite: n'importe quelle autre dr
 
 Trouver la meilleure droite à ajouter se fait au pire en <img src="svgs/90846c243bb784093adbb6d2d0b2b9d0.svg?invert_in_darkmode" align=middle width=43.02219404999999pt height=26.76175259999998pt/> si on teste toutes les droites. Et on répète jusqu'à avoir un sous-ensemble de taille <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/>.
 
-**Résultats:** Encore malheureusement, il n'y a pas inclusion entre les espaces de solution, ce qui rends faux la construction de cette "solution optimale".
+**Résultats:** Encore malheureusement, il n'y a pas inclusion entre les espaces de solution, ce qui rend faux la construction de cette "solution optimale".
 
 > Par ailleurs, l'algorithme peut vite gagner en complexité car en réalité, il peut y avoir plusieurs solutions optimales à chaque <img src="svgs/d6328eaebbcd5c358f426dbea4bdbf70.svg?invert_in_darkmode" align=middle width=15.13700594999999pt height=22.465723500000017pt/>, il faut donc toutes les garder en mémoire pour tester toutes les combinaisons, et donc la complexité peut exploser en <img src="svgs/689cf0247b5199e1cdc5f5747a59e35e.svg?invert_in_darkmode" align=middle width=20.070877199999988pt height=27.6567522pt/>.
 
@@ -195,5 +198,11 @@ Vous obtiendrez les *executables* `main` et `verif`.
 
 ``` bash
 python -m readme2tex --output README.md INPUT.md
+```
+
+On peut éventuellement exporter en pdf avec `pandoc`:
+
+```bash
+pandoc ./README_latex.md --pdf-engine=xelatex -o rendu.pdf
 ```
 

@@ -5,7 +5,13 @@ authors:
 - William Templeton
 - Nathanaël Soulat
 ---
-
+<style>
+    @media (prefers-color-scheme: dark) {
+        img[src ^= "svgs/"] {
+            filter: invert(1);
+        }
+    }
+</style>
 # Projet FIG : Partitionnement de droites
 
 - [Enoncé](#enoncé)
@@ -15,7 +21,6 @@ authors:
     - [Algorithme aléatoire](#algorithme-aléatoire)
 - [Conclusion](#conclusion)
 - [Installer et lancer le projet](#installer-et-lancer-le-projet)
-
 ## Enoncé
 
 ![image](https://user-images.githubusercontent.com/75546258/141136749-815f4440-a7a6-46ea-abd9-3dc462c15c71.png)
