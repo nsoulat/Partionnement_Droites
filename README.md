@@ -169,8 +169,8 @@ L'algorithme commence avec la combinaison trouvé dans `résultat.json` (la meil
 > Résultat final:
 >
 > ```JSON
-> "distance": 1,
-> "droites": [1, 2, 3, 4, 5, 6, 7, 8, 9]
+> "distance": 2.20745,
+> "droites": [17364, 28972, 38713, 48812, 50321, 60109, 62845, 69698, 70825, 92448]
 > ```
 
 ## Installer et lancer le projet
