@@ -169,7 +169,7 @@ L'algorithme commence avec la combinaison trouvé dans `résultat.json` (la meil
 > Résultat final:
 >
 > ```JSON
-> "distance": 2.20745,
+> "distance": 2.2074477292096946,
 > "droites": [17364, 28972, 38713, 48812, 50321, 60109, 62845, 69698, 70825, 92448]
 > ```
 
